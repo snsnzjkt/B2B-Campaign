@@ -33,5 +33,15 @@ services:
     volumes:
       - ./apps/api:/app
 
+  web:
+    build: ./apps/web
+    env_file: .env
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
 volumes:
   db_data:
