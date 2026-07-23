@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from jose import JWTError
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user, get_user_by_sub
+from app.config import settings
 from app.core.errors import ConflictError, InvalidCredentialsError, InvalidTokenError
 from app.core.security import (
     create_access_token,
@@ -14,7 +17,7 @@ from app.core.security import (
 )
 from app.db import get_db
 from app.models import Organization, User
-from app.schemas.auth import LoginRequest, RefreshRequest, RegisterRequest, TokenResponse, UserResponse
+from app.schemas.auth import GoogleAuthRequest, LoginRequest, RefreshRequest, RegisterRequest, TokenResponse, UserResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -74,3 +77,38 @@ def refresh(payload: RefreshRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/google", response_model=TokenResponse)
+def google_auth(payload: GoogleAuthRequest, db: Session = Depends(get_db)):
+    try:
+        info = id_token.verify_oauth2_token(
+            payload.id_token, google_requests.Request(), settings.google_client_id
+        )
+    except ValueError:
+        raise InvalidTokenError()
+
+    email = info["email"]
+    google_sub = info["sub"]
+
+    user = db.scalar(select(User).where(User.email == email))
+    if user is None:
+        org = Organization(name=email.split("@")[0])
+        db.add(org)
+        db.flush()
+        user = User(
+            organization_id=org.id,
+            email=email,
+            oauth_provider="google",
+            oauth_id=google_sub,
+            role="owner",
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+    elif user.oauth_provider is None:
+        user.oauth_provider = "google"
+        user.oauth_id = google_sub
+        db.commit()
+
+    return _tokens_for(user)
