@@ -131,9 +131,9 @@ def test_create_lead_with_email_sets_verified_from_check(client, auth_headers):
 def test_update_lead_email_reverifies(client, auth_headers):
     create = client.post("/api/v1/leads", json={"contact_name": "Jane Doe"}, headers=auth_headers)
     lead_id = create.json()["id"]
-    with patch("app.api.routes.leads.verify_email", return_value=False):
+    with patch("app.api.routes.leads.verify_email", return_value=True):
         response = client.patch(
-            f"/api/v1/leads/{lead_id}", json={"email": "bad@nomx.example"}, headers=auth_headers
+            f"/api/v1/leads/{lead_id}", json={"email": "jane@example.com"}, headers=auth_headers
         )
     assert response.status_code == 200
-    assert response.json()["email_verified"] is False
+    assert response.json()["email_verified"] is True
