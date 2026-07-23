@@ -12,6 +12,7 @@ dependencies = [
     "passlib[bcrypt]>=1.7",
     "python-jose[cryptography]>=3.3",
     "google-auth>=2.35",
+    "bcrypt<5.0",
 ]
 
 [dependency-groups]
