@@ -17,7 +17,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       .finally(() => setChecked(true));
   }, [router]);
 
-  if (!checked) return null;
+  if (!checked || !user) return null;
 
   return (
     <div className="min-h-screen bg-neutral-50">

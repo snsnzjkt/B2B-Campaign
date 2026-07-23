@@ -12,3 +12,14 @@ test("register and see empty leads state", async ({ page }) => {
   await expect(page).toHaveURL(/\/leads/);
   await expect(page.getByText("No leads yet")).toBeVisible();
 });
+
+test("unauthenticated visit to /leads redirects to /login", async ({ browser }) => {
+  // Fresh, isolated context (no localStorage/cookies from other tests in this file).
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await page.goto("/leads");
+  await expect(page).toHaveURL(/\/login/);
+
+  await context.close();
+});
