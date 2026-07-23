@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import auth, companies, health
+from app.api.routes import auth, companies, health, leads
 from app.config import settings
 from app.core.errors import AppError
 
@@ -29,3 +29,4 @@ app.add_exception_handler(AppError, app_error_handler)
 app.include_router(health.router)
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(companies.router, prefix="/api/v1")
+app.include_router(leads.router, prefix="/api/v1")
