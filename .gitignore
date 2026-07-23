@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Env
+.env
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Superpowers scratch state
+.superpowers/
