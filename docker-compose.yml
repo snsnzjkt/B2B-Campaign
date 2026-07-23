@@ -20,5 +20,18 @@ services:
     ports:
       - "6379:6379"
 
+  api:
+    build: ./apps/api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://postgres:postgres@db:5432/b2b_campaign
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+
 volumes:
   db_data:
