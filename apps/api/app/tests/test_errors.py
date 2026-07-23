@@ -23,3 +23,16 @@ def test_app_error_returns_consistent_shape():
         "message": "Widget not found",
         "details": {"widget_id": "42"},
     }
+
+
+def test_request_validation_error_returns_consistent_shape(client):
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"organization_name": "Acme Inc", "email": "not-an-email", "password": "short"},
+    )
+    assert response.status_code == 422
+    body = response.json()
+    assert body["code"] == "validation_error"
+    assert body["message"] == "Request validation failed"
+    assert "errors" in body["details"]
+    assert len(body["details"]["errors"]) >= 1

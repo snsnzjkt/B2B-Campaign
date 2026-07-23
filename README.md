@@ -101,3 +101,12 @@ are required to respect target sites' robots.txt/ToS, maintain a
 suppression list, honor unsubscribe/opt-out requests, and avoid
 harvesting personal data from sources that prohibit automated access.
 See the design spec for details.
+
+## Known gaps
+
+- **Google OAuth frontend button**: the backend `POST /api/v1/auth/google`
+  endpoint is fully implemented and tested. The frontend "Sign in with
+  Google" button has not been wired up yet — this was intentionally
+  deferred until a real Google Cloud OAuth client ID is available to test
+  against. Add it once a real `GOOGLE_CLIENT_ID` / `NEXT_PUBLIC_GOOGLE_CLIENT_ID`
+  pair is available.
