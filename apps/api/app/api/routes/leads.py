@@ -5,6 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_current_user
+from app.core.email_verify import verify_email
 from app.core.errors import NotFoundError
 from app.db import get_db
 from app.models import Company, Lead, User
@@ -27,6 +28,8 @@ def create_lead(
 ):
     _validate_company(db, current_user, payload.company_id)
     lead = Lead(organization_id=current_user.organization_id, **payload.model_dump())
+    if lead.email:
+        lead.email_verified = verify_email(lead.email)
     db.add(lead)
     db.commit()
     db.refresh(lead)
@@ -63,6 +66,8 @@ def update_lead(
         _validate_company(db, current_user, data["company_id"])
     for field, value in data.items():
         setattr(lead, field, value)
+    if "email" in data:
+        lead.email_verified = verify_email(lead.email) if lead.email else False
     db.commit()
     db.refresh(lead)
     return lead
