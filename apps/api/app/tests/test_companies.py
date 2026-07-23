@@ -50,3 +50,44 @@ def test_companies_are_scoped_to_organization(client, auth_headers):
     listing = client.get("/api/v1/companies", headers=other_headers)
     assert listing.status_code == 200
     assert listing.json() == []
+
+
+def test_companies_by_id_are_scoped_to_organization(client, auth_headers):
+    # Create a company as Org A
+    create_response = client.post("/api/v1/companies", json={"name": "Org A Co"}, headers=auth_headers)
+    assert create_response.status_code == 201
+    org_a_company_id = create_response.json()["id"]
+    original_data = create_response.json()
+
+    # Register Org B
+    other_register = client.post(
+        "/api/v1/auth/register",
+        json={"organization_name": "Other Org", "email": "other@example.com", "password": "password123"},
+    )
+    assert other_register.status_code == 201
+    other_headers = {"Authorization": f"Bearer {other_register.json()['access_token']}"}
+
+    # Test GET by ID: Org B should get 404
+    get_response = client.get(f"/api/v1/companies/{org_a_company_id}", headers=other_headers)
+    assert get_response.status_code == 404
+    assert get_response.json()["code"] == "not_found"
+
+    # Test PATCH by ID: Org B should get 404
+    patch_response = client.patch(
+        f"/api/v1/companies/{org_a_company_id}",
+        json={"industry": "Evil Corp"},
+        headers=other_headers,
+    )
+    assert patch_response.status_code == 404
+    assert patch_response.json()["code"] == "not_found"
+
+    # Test DELETE by ID: Org B should get 404
+    delete_response = client.delete(f"/api/v1/companies/{org_a_company_id}", headers=other_headers)
+    assert delete_response.status_code == 404
+    assert delete_response.json()["code"] == "not_found"
+
+    # Verify Org A's company still exists and is unchanged
+    verify_response = client.get(f"/api/v1/companies/{org_a_company_id}", headers=auth_headers)
+    assert verify_response.status_code == 200
+    assert verify_response.json()["id"] == org_a_company_id
+    assert verify_response.json()["name"] == original_data["name"]
