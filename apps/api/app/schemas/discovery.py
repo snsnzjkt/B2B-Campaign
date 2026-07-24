@@ -17,3 +17,12 @@ class DiscoveryCandidate(BaseModel):
 
 class DiscoverySearchResponse(BaseModel):
     candidates: list[DiscoveryCandidate]
+
+
+class DiscoveryImportRequest(BaseModel):
+    candidates: list[DiscoveryCandidate]
+
+
+class DiscoveryImportResponse(BaseModel):
+    created: int
+    skipped_duplicate: int
