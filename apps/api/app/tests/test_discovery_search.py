@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+import requests
+
 from app.providers.base import DiscoveredCompany
 
 FAKE_RESULTS = [
@@ -98,3 +100,17 @@ def test_search_cap_is_scoped_per_organization(client, auth_headers, monkeypatch
             headers=other_headers,
         )
     assert response.status_code == 200
+
+
+def test_search_returns_structured_error_when_provider_fails(client, auth_headers):
+    with patch(
+        "app.api.routes.discovery.GooglePlacesProvider.search",
+        side_effect=requests.HTTPError("Google Places API error"),
+    ):
+        response = client.post(
+            "/api/v1/discovery/search",
+            json={"query": "agencies", "location": "Denver, CO"},
+            headers=auth_headers,
+        )
+    assert response.status_code == 502
+    assert response.json()["code"] == "provider_unavailable"

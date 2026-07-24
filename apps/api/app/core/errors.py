@@ -34,3 +34,8 @@ class ConflictError(AppError):
 class RateLimitExceededError(AppError):
     def __init__(self, message: str = "Monthly search limit reached"):
         super().__init__(code="rate_limit_exceeded", message=message, status_code=429)
+
+
+class ProviderUnavailableError(AppError):
+    def __init__(self, message: str = "Discovery provider is temporarily unavailable"):
+        super().__init__(code="provider_unavailable", message=message, status_code=502)

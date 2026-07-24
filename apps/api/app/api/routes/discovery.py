@@ -1,6 +1,7 @@
 import uuid
 from datetime import UTC, datetime
 
+import requests
 from fastapi import APIRouter, Depends
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -8,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_user
 from app.config import settings
 from app.core.dedup import find_duplicate_company
-from app.core.errors import RateLimitExceededError
+from app.core.errors import ProviderUnavailableError, RateLimitExceededError
 from app.db import get_db
 from app.models import Company, Lead, ProviderSearchLog, User
 from app.providers.google_places import GooglePlacesProvider
@@ -51,7 +52,10 @@ def search(
     db.add(ProviderSearchLog(organization_id=current_user.organization_id, provider=PROVIDER_NAME))
     db.commit()
 
-    results = GooglePlacesProvider().search(payload.query, payload.location)
+    try:
+        results = GooglePlacesProvider().search(payload.query, payload.location)
+    except requests.RequestException:
+        raise ProviderUnavailableError()
 
     candidates = [
         DiscoveryCandidate(
