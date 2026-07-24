@@ -29,3 +29,8 @@ class InvalidTokenError(AppError):
 class ConflictError(AppError):
     def __init__(self, message: str, details: dict | None = None):
         super().__init__(code="conflict", message=message, status_code=409, details=details)
+
+
+class RateLimitExceededError(AppError):
+    def __init__(self, message: str = "Monthly search limit reached"):
+        super().__init__(code="rate_limit_exceeded", message=message, status_code=429)
