@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 15
     refresh_token_expire_days: int = 30
     google_client_id: str = ""
+    google_places_api_key: str = ""
+    discovery_search_monthly_cap: int = 200
     cors_origins: list[str] = ["http://localhost:3000"]
 
 

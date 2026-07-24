@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
 
 interface Lead {
@@ -25,9 +26,13 @@ export default function LeadsPage() {
     return (
       <div className="rounded-lg border border-dashed border-neutral-300 bg-white p-12 text-center">
         <h2 className="text-lg font-medium text-neutral-900">No leads yet</h2>
-        <p className="mt-2 text-sm text-neutral-500">
-          Lead discovery and import are coming in the next release.
-        </p>
+        <p className="mt-2 text-sm text-neutral-500">Search for companies to import as leads.</p>
+        <Link
+          href="/leads/discover"
+          className="mt-4 inline-block text-sm font-medium text-neutral-900 underline underline-offset-4"
+        >
+          Discover leads
+        </Link>
       </div>
     );
   }

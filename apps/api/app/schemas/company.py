@@ -35,6 +35,7 @@ class CompanyResponse(BaseModel):
     description: str | None
     social_links: dict
     source: str
+    external_id: str | None
     created_at: datetime
 
     model_config = {"from_attributes": True}

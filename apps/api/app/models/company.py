@@ -24,6 +24,7 @@ class Company(Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     social_links: Mapped[dict] = mapped_column(JSON, default=dict)
     source: Mapped[str] = mapped_column(String(50), default="manual")
+    external_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     leads: Mapped[list["Lead"]] = relationship(back_populates="company")
