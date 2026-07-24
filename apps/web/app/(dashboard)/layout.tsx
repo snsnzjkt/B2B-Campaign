@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { type CurrentUser, getCurrentUser, logout } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 
@@ -22,7 +23,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="min-h-screen bg-neutral-50">
       <header className="flex items-center justify-between border-b border-neutral-200 bg-white px-6 py-4">
-        <span className="font-semibold text-neutral-900">B2B Campaign</span>
+        <div className="flex items-center gap-6">
+          <span className="font-semibold text-neutral-900">B2B Campaign</span>
+          <nav className="flex items-center gap-4 text-sm text-neutral-600">
+            <Link href="/leads" className="hover:text-neutral-900">
+              Leads
+            </Link>
+            <Link href="/leads/discover" className="hover:text-neutral-900">
+              Discover
+            </Link>
+          </nav>
+        </div>
         {user && (
           <div className="flex items-center gap-4">
             <span className="text-sm text-neutral-500">{user.email}</span>
